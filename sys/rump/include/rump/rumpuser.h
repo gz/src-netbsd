@@ -37,6 +37,8 @@
 #error The rump/rumpuser.h interface is not for non-kernel consumers
 #endif
 struct lwp;
+struct mbuf;
+struct ifnet;
 
 /*
  * init
@@ -66,6 +68,13 @@ struct rumpuser_hyperup {
 	void *hyp__extra[8];
 };
 int rumpuser_init(int, const struct rumpuser_hyperup *);
+
+/*
+ * network server
+ */
+void rumpuser_network_init(const char *, struct ifnet *);
+int rumpuser_network_portbind(uint16_t *, uint8_t);
+int rumpuser_network_receive(struct mbuf *);
 
 /*
  * memory allocation

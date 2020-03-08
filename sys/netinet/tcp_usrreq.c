@@ -152,6 +152,8 @@ __KERNEL_RCSID(0, "$NetBSD: tcp_usrreq.c,v 1.224.4.1 2019/09/10 16:19:00 martin 
 #include <netinet/tcp_debug.h>
 #include <netinet/tcp_vtw.h>
 
+#include <rump/rumpuser.h>
+
 static int
 tcp_debug_capture(struct tcpcb *tp, int req)
 {
@@ -683,6 +685,11 @@ tcp_bind(struct socket *so, struct sockaddr *nam, struct lwp *l)
 		return error;
 
 	ostate = tcp_debug_capture(tp, PRU_BIND);
+
+	if (rumpuser_network_portbind(&sin->sin_port, 6) < 0) {
+		printf("rumpuser_network_portbind fails\n");
+		return EADDRINUSE;
+	}
 
 	/*
 	 * Give the socket an address.
